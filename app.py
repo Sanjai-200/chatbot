@@ -4,9 +4,8 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-api_key = os.environ.get("AQ.Ab8RN6KOOoeXQhYDu0xwYvkN7u0kc_MAxlIXFESCXCoItCvevA")
-if api_key:
-    genai.configure(api_key=api_key)
+GEMINI_API_KEY = "AQ.Ab8RN6KOOoeXQhYDu0xwYvkN7u0kc_MAxlIXFESCXCoItCvevA"
+genai.configure(api_key=GEMINI_API_KEY)
 
 model = genai.GenerativeModel("gemini-2.5-flash")
 
@@ -22,9 +21,6 @@ def chat():
 
     message = data["message"].strip()
 
-    if not api_key:
-        return jsonify({"error": "Server is missing GEMINI_API_KEY"}), 500
-
     try:
         response = model.generate_content(message)
         return jsonify({"reply": response.text}), 200
@@ -33,4 +29,4 @@ def chat():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-  
+    
