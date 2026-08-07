@@ -1,13 +1,11 @@
 import os
 from flask import Flask, request, jsonify, render_template
-import google.generativeai as genai
+from google import genai
 
 app = Flask(__name__)
 
 GEMINI_API_KEY = "AQ.Ab8RN6KPjZdC1gEmeDJR3do1v8kNHqzdY8azg2REvUasd3JCkw"
-genai.configure(api_key=GEMINI_API_KEY)
-
-model = genai.GenerativeModel("gemini-2.5-flash")
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 @app.route("/")
 def index():
@@ -22,10 +20,13 @@ def chat():
     message = data["message"].strip()
 
     try:
-        response = model.generate_content(message)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=message
+        )
         return jsonify({"reply": response.text}), 200
-    except Exception:
-        return jsonify({"error": "Failed to get response from Gemini"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
